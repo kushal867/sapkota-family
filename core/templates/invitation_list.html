@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block title %}Invitations{% endblock %}
+
+{% block content %}
+<h1>Event Invitations</h1>
+<a href="{% url 'invitation_create' %}" class="btn btn-primary mb-3">Create New Invitation</a>
+
+<div class="row">
+    {% for invitation in invitations %}
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">{{ invitation.title }}</h5>
+                <h6 class="card-subtitle mb-2 text-muted">{{ invitation.date }}</h6>
+                {% if invitation.location %}
+                <p class="card-text"><strong>Location:</strong> {{ invitation.location }}</p>
+                {% endif %}
+                {% if invitation.description %}
+                <p class="card-text">{{ invitation.description|truncatewords:20 }}</p>
+                {% endif %}
+                <p class="card-text"><small class="text-muted">Created: {{ invitation.created_at|date:"M d, Y" }}</small></p>
+                <a href="{% url 'invitation_detail' invitation.pk %}" class="btn btn-outline-primary btn-sm">View Details</a>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12">
+        <div class="alert alert-info">No invitations found.</div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

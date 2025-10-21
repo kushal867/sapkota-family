@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if birthday %}Edit{% else %}Add{% endif %} Birthday{% endblock %}
+
+{% block content %}
+<h1>{% if birthday %}Edit{% else %}Add{% endif %} Birthday</h1>
+
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    
+    <div class="mb-3">
+        <label for="name" class="form-label">Name</label>
+        <input type="text" class="form-control" id="name" name="name" 
+               value="{{ birthday.name|default:'' }}" required>
+    </div>
+    
+    <div class="mb-3">
+        <label for="date_of_birth" class="form-label">Date of Birth</label>
+        <input type="date" class="form-control" id="date_of_birth" name="date_of_birth" 
+               value="{{ birthday.date_of_birth|default:'' }}" required>
+    </div>
+    
+    <div class="mb-3">
+        <label for="message" class="form-label">Message</label>
+        <textarea class="form-control" id="message" name="message" rows="4">{{ birthday.message|default:'' }}</textarea>
+    </div>
+    
+    <div class="mb-3">
+        <label for="photo" class="form-label">Photo</label>
+        <input type="file" class="form-control" id="photo" name="photo">
+        {% if birthday.photo %}
+        <div class="mt-2">
+            <p>Current photo:</p>
+            <img src="{{ birthday.photo.url }}" alt="{{ birthday.name }}" class="img-thumbnail" style="max-height: 200px;">
+        </div>
+        {% endif %}
+    </div>
+    
+    <button type="submit" class="btn btn-primary">Save</button>
+    <a href="{% url 'birthday_list' %}" class="btn btn-secondary">Cancel</a>
+</form>
+{% endblock %}
