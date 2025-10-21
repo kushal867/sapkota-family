@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ invitation.title }}{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h2>{{ invitation.title }}</h2>
+    </div>
+    <div class="card-body">
+        <p><strong>Date:</strong> {{ invitation.date }}</p>
+        {% if invitation.location %}
+        <p><strong>Location:</strong> {{ invitation.location }}</p>
+        {% endif %}
+        {% if invitation.description %}
+        <p><strong>Description:</strong></p>
+        <p>{{ invitation.description|linebreaks }}</p>
+        {% endif %}
+        <p class="text-muted">Created on: {{ invitation.created_at|date:"F d, Y H:i" }}</p>
+    </div>
+    <div class="card-footer">
+        <a href="{% url 'invitation_list' %}" class="btn btn-secondary">Back to List</a>
+    </div>
+</div>
+{% endblock %}

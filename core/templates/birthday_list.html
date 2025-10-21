@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block title %}Birthdays{% endblock %}
+
+{% block content %}
+<h1>Birthdays</h1>
+<a href="{% url 'birthday_create' %}" class="btn btn-primary mb-3">Add New Birthday</a>
+
+<div class="row">
+    {% for birthday in birthdays %}
+    <div class="col-md-4">
+        <div class="card">
+            {% if birthday.photo %}
+            <img src="{{ birthday.photo.url }}" class="card-img-top birthday-photo" alt="{{ birthday.name }}">
+            {% endif %}
+            <div class="card-body">
+                <h5 class="card-title">{{ birthday.name }}</h5>
+                <h6 class="card-subtitle mb-2 text-muted">{{ birthday.date_of_birth }}</h6>
+                {% if birthday.message %}
+                <p class="card-text">{{ birthday.message|truncatewords:15 }}</p>
+                {% endif %}
+                <a href="{% url 'birthday_detail' birthday.pk %}" class="btn btn-outline-primary btn-sm">View Details</a>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12">
+        <div class="alert alert-info">No birthdays found.</div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

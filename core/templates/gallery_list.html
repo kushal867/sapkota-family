@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block title %}Gallery{% endblock %}
+
+{% block content %}
+<h1>Photo Gallery</h1>
+<a href="{% url 'gallery_create' %}" class="btn btn-primary mb-3">Upload New Image</a>
+
+<div class="row">
+    {% for image in gallery %}
+    <div class="col-md-4">
+        <div class="card">
+            <img src="{{ image.image.url }}" class="card-img-top gallery-img" alt="{{ image.title }}">
+            <div class="card-body">
+                <h5 class="card-title">{{ image.title }}</h5>
+                {% if image.caption %}
+                <p class="card-text">{{ image.caption }}</p>
+                {% endif %}
+                <p class="card-text"><small class="text-muted">Uploaded: {{ image.uploaded_at|date:"M d, Y" }}</small></p>
+                <a href="{% url 'gallery_detail' image.pk %}" class="btn btn-outline-primary btn-sm">View Details</a>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12">
+        <div class="alert alert-info">No images in gallery.</div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

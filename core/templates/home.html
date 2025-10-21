@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+
+{% block title %}Home - Sapkota Family{% endblock %}
+
+{% block content %}
+<div class="jumbotron text-center">
+    <h1 class="display-4">Welcome to Sapkota Family</h1>
+    <p class="lead">Where love grows and memories are made forever</p>
+    <hr class="my-4">
+    <p>Celebrate special moments, cherish birthdays, and preserve our family memories together.</p>
+</div>
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="card feature-card text-white bg-primary">
+            <div class="card-body text-center">
+                <i class="bi bi-envelope-paper display-4 mb-3"></i>
+                <h5 class="card-title">Family Invitations</h5>
+                <p class="card-text">Create and manage family event invitations</p>
+                <a href="{% url 'invitation_list' %}" class="btn btn-light">
+                    View Invitations <i class="bi bi-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card feature-card text-white bg-success">
+            <div class="card-body text-center">
+                <i class="bi bi-balloon display-4 mb-3"></i>
+                <h5 class="card-title">Family Birthdays</h5>
+                <p class="card-text">Celebrate our family birthdays and special days</p>
+                <a href="{% url 'birthday_list' %}" class="btn btn-light">
+                    View Birthdays <i class="bi bi-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card feature-card text-white bg-warning">
+            <div class="card-body text-center">
+                <i class="bi bi-images display-4 mb-3"></i>
+                <h5 class="card-title">Family Gallery</h5>
+                <p class="card-text">Preserve our precious family moments and memories</p>
+                <a href="{% url 'gallery_list' %}" class="btn btn-light">
+                    View Gallery <i class="bi bi-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Family Stats -->
+<div class="row mt-5">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-light">
+                <h4 class="mb-0"><i class="bi bi-graph-up"></i> Family Overview</h4>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-md-3">
+                        <h3 class="text-primary">{{ invitations_count }}</h3>
+                        <p class="text-muted">Family Events</p>
+                    </div>
+                    <div class="col-md-3">
+                        <h3 class="text-success">{{ birthdays_count }}</h3>
+                        <p class="text-muted">Birthdays</p>
+                    </div>
+                    <div class="col-md-3">
+                        <h3 class="text-warning">{{ gallery_count }}</h3>
+                        <p class="text-muted">Memories</p>
+                    </div>
+                    <div class="col-md-3">
+                        <h3 class="text-info">∞</h3>
+                        <p class="text-muted">Love & Care</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

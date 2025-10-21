@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ birthday.name }}{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-body">
+        <div class="row">
+            {% if birthday.photo %}
+            <div class="col-md-4">
+                <img src="{{ birthday.photo.url }}" class="img-fluid rounded" alt="{{ birthday.name }}">
+            </div>
+            {% endif %}
+            <div class="{% if birthday.photo %}col-md-8{% else %}col-12{% endif %}">
+                <h2>{{ birthday.name }}</h2>
+                <p><strong>Date of Birth:</strong> {{ birthday.date_of_birth }}</p>
+                {% if birthday.message %}
+                <p><strong>Message:</strong></p>
+                <p>{{ birthday.message|linebreaks }}</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="card-footer">
+        <a href="{% url 'birthday_list' %}" class="btn btn-secondary">Back to List</a>
+    </div>
+</div>
+{% endblock %}
