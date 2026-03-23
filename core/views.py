@@ -1,189 +1,166 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from django.urls import reverse_lazy
 from django.contrib import messages
-from .models import Invitation, Birthday, Gallery
+from django.views.decorators.http import require_POST
+from django.contrib.auth.decorators import login_required
 
-# Home View
+from .models import Invitation, Birthday, Gallery
+from .forms import InvitationForm, BirthdayForm, GalleryForm
+
+
+# Home
 def home(request):
-    """Home page view"""
-    context = {
+    return render(request, 'home.html', {
         'invitations_count': Invitation.objects.count(),
         'birthdays_count': Birthday.objects.count(),
         'gallery_count': Gallery.objects.count(),
-    }
-    return render(request, 'home.html', context)
+    })
 
-# Invitation Views
+
+# ---------- GENERIC HANDLER ----------
+def handle_form(request, form_class, template, instance=None, success_msg="", redirect_url=""):
+    form = form_class(request.POST or None, request.FILES or None, instance=instance)
+
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        messages.success(request, success_msg)
+        return redirect(redirect_url)
+
+    return render(request, template, {"form": form})
+
+
+# ---------- INVITATION ----------
 def invitation_list(request):
-    """Invitation list view"""
-    invitations = Invitation.objects.all().order_by('-created_at')
-    return render(request, 'invitation_list.html', {'invitations': invitations})
+    return render(request, 'invitation_list.html', {
+        'invitations': Invitation.objects.order_by('-created_at')
+    })
+
 
 def invitation_detail(request, pk):
-    """Invitation detail view"""
-    invitation = get_object_or_404(Invitation, pk=pk)
-    return render(request, 'invitation_detail.html', {'invitation': invitation})
+    return render(request, 'invitation_detail.html', {
+        'invitation': get_object_or_404(Invitation, pk=pk)
+    })
 
+
+@login_required
 def invitation_create(request):
-    """Create new invitation"""
-    if request.method == 'POST':
-        title = request.POST.get('title')
-        date = request.POST.get('date')
-        location = request.POST.get('location')
-        description = request.POST.get('description')
-        
-        invitation = Invitation(
-            title=title,
-            date=date,
-            location=location,
-            description=description
-        )
-        invitation.save()
-        messages.success(request, 'Invitation created successfully!')
-        return redirect('invitation_list')
-    
-    return render(request, 'invitation_form.html')
+    return handle_form(
+        request,
+        InvitationForm,
+        'invitation_form.html',
+        success_msg="Invitation created successfully!",
+        redirect_url='invitation_list'
+    )
 
+
+@login_required
 def invitation_update(request, pk):
-    """Update existing invitation"""
     invitation = get_object_or_404(Invitation, pk=pk)
-    
-    if request.method == 'POST':
-        invitation.title = request.POST.get('title')
-        invitation.date = request.POST.get('date')
-        invitation.location = request.POST.get('location')
-        invitation.description = request.POST.get('description')
-        invitation.save()
-        
-        messages.success(request, 'Invitation updated successfully!')
-        return redirect('invitation_list')
-    
-    return render(request, 'invitation_form.html', {'invitation': invitation})
+    return handle_form(
+        request,
+        InvitationForm,
+        'invitation_form.html',
+        instance=invitation,
+        success_msg="Invitation updated successfully!",
+        redirect_url='invitation_list'
+    )
 
+
+@login_required
+@require_POST
 def invitation_delete(request, pk):
-    """Delete invitation"""
     invitation = get_object_or_404(Invitation, pk=pk)
-    
-    if request.method == 'POST':
-        invitation.delete()
-        messages.success(request, 'Invitation deleted successfully!')
-        return redirect('invitation_list')
-    
-    return render(request, 'invitation_confirm_delete.html', {'invitation': invitation})
+    invitation.delete()
+    messages.success(request, "Invitation deleted successfully!")
+    return redirect('invitation_list')
 
-# Birthday Views
+
+# ---------- BIRTHDAY ----------
 def birthday_list(request):
-    """Birthday list view"""
-    birthdays = Birthday.objects.all().order_by('name')
-    return render(request, 'birthday_list.html', {'birthdays': birthdays})
+    return render(request, 'birthday_list.html', {
+        'birthdays': Birthday.objects.order_by('name')
+    })
+
 
 def birthday_detail(request, pk):
-    """Birthday detail view"""
-    birthday = get_object_or_404(Birthday, pk=pk)
-    return render(request, 'birthday_detail.html', {'birthday': birthday})
+    return render(request, 'birthday_detail.html', {
+        'birthday': get_object_or_404(Birthday, pk=pk)
+    })
 
+
+@login_required
 def birthday_create(request):
-    """Create new birthday"""
-    if request.method == 'POST':
-        name = request.POST.get('name')
-        date_of_birth = request.POST.get('date_of_birth')
-        message = request.POST.get('message')
-        photo = request.FILES.get('photo')
-        
-        birthday = Birthday(
-            name=name,
-            date_of_birth=date_of_birth,
-            message=message,
-            photo=photo
-        )
-        birthday.save()
-        messages.success(request, 'Birthday added successfully!')
-        return redirect('birthday_list')
-    
-    return render(request, 'birthday_form.html')
+    return handle_form(
+        request,
+        BirthdayForm,
+        'birthday_form.html',
+        success_msg="Birthday added successfully!",
+        redirect_url='birthday_list'
+    )
 
+
+@login_required
 def birthday_update(request, pk):
-    """Update existing birthday"""
     birthday = get_object_or_404(Birthday, pk=pk)
-    
-    if request.method == 'POST':
-        birthday.name = request.POST.get('name')
-        birthday.date_of_birth = request.POST.get('date_of_birth')
-        birthday.message = request.POST.get('message')
-        
-        if 'photo' in request.FILES:
-            birthday.photo = request.FILES['photo']
-        
-        birthday.save()
-        messages.success(request, 'Birthday updated successfully!')
-        return redirect('birthday_list')
-    
-    return render(request, 'birthday_form.html', {'birthday': birthday})
+    return handle_form(
+        request,
+        BirthdayForm,
+        'birthday_form.html',
+        instance=birthday,
+        success_msg="Birthday updated successfully!",
+        redirect_url='birthday_list'
+    )
 
+
+@login_required
+@require_POST
 def birthday_delete(request, pk):
-    """Delete birthday"""
     birthday = get_object_or_404(Birthday, pk=pk)
-    
-    if request.method == 'POST':
-        birthday.delete()
-        messages.success(request, 'Birthday deleted successfully!')
-        return redirect('birthday_list')
-    
-    return render(request, 'birthday_confirm_delete.html', {'birthday': birthday})
+    birthday.delete()
+    messages.success(request, "Birthday deleted successfully!")
+    return redirect('birthday_list')
 
-# Gallery Views
+
+# ---------- GALLERY ----------
 def gallery_list(request):
-    """Gallery list view"""
-    gallery = Gallery.objects.all().order_by('-uploaded_at')
-    return render(request, 'gallery_list.html', {'gallery': gallery})
+    return render(request, 'gallery_list.html', {
+        'gallery': Gallery.objects.order_by('-uploaded_at')
+    })
+
 
 def gallery_detail(request, pk):
-    """Gallery detail view"""
-    image = get_object_or_404(Gallery, pk=pk)
-    return render(request, 'gallery_detail.html', {'image': image})
+    return render(request, 'gallery_detail.html', {
+        'image': get_object_or_404(Gallery, pk=pk)
+    })
 
+
+@login_required
 def gallery_create(request):
-    """Create new gallery image"""
-    if request.method == 'POST':
-        title = request.POST.get('title')
-        image = request.FILES.get('image')
-        caption = request.POST.get('caption')
-        
-        gallery = Gallery(
-            title=title,
-            image=image,
-            caption=caption
-        )
-        gallery.save()
-        messages.success(request, 'Image uploaded successfully!')
-        return redirect('gallery_list')
-    
-    return render(request, 'gallery_form.html')
+    return handle_form(
+        request,
+        GalleryForm,
+        'gallery_form.html',
+        success_msg="Image uploaded successfully!",
+        redirect_url='gallery_list'
+    )
 
+
+@login_required
 def gallery_update(request, pk):
-    """Update existing gallery image"""
     image = get_object_or_404(Gallery, pk=pk)
-    
-    if request.method == 'POST':
-        image.title = request.POST.get('title')
-        image.caption = request.POST.get('caption')
-        
-        if 'image' in request.FILES:
-            image.image = request.FILES['image']
-        
-        image.save()
-        messages.success(request, 'Image updated successfully!')
-        return redirect('gallery_list')
-    
-    return render(request, 'gallery_form.html', {'image': image})
+    return handle_form(
+        request,
+        GalleryForm,
+        'gallery_form.html',
+        instance=image,
+        success_msg="Image updated successfully!",
+        redirect_url='gallery_list'
+    )
 
+
+@login_required
+@require_POST
 def gallery_delete(request, pk):
-    """Delete gallery image"""
     image = get_object_or_404(Gallery, pk=pk)
-    
-    if request.method == 'POST':
-        image.delete()
-        messages.success(request, 'Image deleted successfully!')
-        return redirect('gallery_list')
-    
-    return render(request, 'gallery_confirm_delete.html', {'image': image})
+    image.delete()
+    messages.success(request, "Image deleted successfully!")
+    return redirect('gallery_list')
